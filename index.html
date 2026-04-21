@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界国家边界 </title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; display: flex; flex-direction: column; }
+        .app-header { background: linear-gradient(135deg, #1a2a6c, #2c3e50, #2a5298); color: white; padding: 16px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 3px solid #f39c12; flex-shrink: 0; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; }
+        .header-title { display: flex; align-items: center; gap: 12px; }
+        .title-icon { font-size: 32px; }
+        .header-title h1 { font-size: 26px; font-weight: 600; }
+        .title-badge { background: rgba(243,156,18,0.9); padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-left: 12px; }
+        .map-area { flex: 1; display: flex; min-height: 0; }
+        .left-panel { width: 320px; background: white; box-shadow: 2px 0 12px rgba(0,0,0,0.08); overflow-y: auto; border-right: 1px solid #d0d7de; z-index: 10; }
+        .panel-card { border-bottom: 1px solid #e9ecef; }
+        .card-header { display: flex; align-items: center; gap: 10px; padding: 16px 18px; background: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+        .card-header h3 { font-size: 16px; font-weight: 600; color: #2c3e50; text-transform: uppercase; }
+        .card-body { padding: 8px 0; max-height: 400px; overflow-y: auto; }
+        .map-container { flex: 1; height: 100%; position: relative; }
+        .map-widget-search { position: absolute; top: 20px; right: 20px; width: 320px; z-index: 20; box-shadow: 0 4px 16px rgba(0,0,0,0.15); border-radius: 8px; }
+        .map-widget-scalebar { position: absolute; bottom: 20px; left: 20px; z-index: 20; }
+        .app-footer { background: #2c3e50; color: #ecf0f1; padding: 12px 24px; text-align: center; border-top: 2px solid #1a252f; flex-shrink: 0; font-size: 13px; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-title">
+                <span class="title-icon">🗺️</span>
+                <h1>世界国家边界</h1>
+            </div>
+            <div><span>数据来源: ArcGIS Living Atlas</span></div>
+        </div>
+    </header>
+    <div class="map-area">
+        <div class="left-panel">
+            <div class="panel-card">
+                <div class="card-header"><span>🗺️</span><h3>底图切换</h3></div>
+                <div class="card-body" id="basemapGalleryDiv"></div>
+            </div>
+            <div class="panel-card">
+                <div class="card-header"><span>📋</span><h3>图层控制</h3></div>
+                <div class="card-body" id="layerListDiv"></div>
+            </div>
+            <div class="panel-card">
+                <div class="card-header"><span>🎨</span><h3>图例</h3></div>
+                <div class="card-body" id="legendDiv"></div>
+            </div>
+        </div>
+        <div id="viewDiv" class="map-container"></div>
+        <div id="searchDiv" class="map-widget-search"></div>
+        <div id="scaleBarDiv" class="map-widget-scalebar"></div>
+    </div>
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>© 2026 实验六：基于ArcGIS API for JavaScript构建WebGIS应用</p>
+        </div>
+    </footer>
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <script>
+        require([
+            "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer",
+            "esri/widgets/BasemapGallery", "esri/widgets/LayerList", "esri/widgets/Legend",
+            "esri/widgets/Search", "esri/widgets/ScaleBar"
+        ], function(Map, MapView, FeatureLayer, BasemapGallery, LayerList, Legend, Search, ScaleBar) {
+            const map = new Map({ basemap: "streets-navigation-vector" });
+            
+            // --- 在这里替换成你选择的新图层URL ---
+            const featureLayerUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries_(Generalized)/FeatureServer/0";
+            
+            const featureLayer = new FeatureLayer({
+                url: featureLayerUrl,
+                title: "世界国家边界",
+                popupTemplate: {
+                    title: "{COUNTRY}",
+                    content: "人口估计: {POP_EST}"
+                }
+            });
+            
+            map.add(featureLayer);
+            
+            const view = new MapView({
+                container: "viewDiv", map: map, center: [0, 20], zoom: 2,
+                ui: { components: ["zoom", "compass"] }
+            });
+            
+            view.when(() => {
+                new BasemapGallery({ view: view, container: "basemapGalleryDiv" });
+                new LayerList({ view: view, container: "layerListDiv" });
+                new Legend({ view: view, container: "legendDiv" });
+                new Search({ view: view, container: "searchDiv", includeDefaultSources: true });
+                new ScaleBar({ view: view, container: "scaleBarDiv", unit: "dual" });
+            });
+        });
+    </script>
+</body>
+</html>
