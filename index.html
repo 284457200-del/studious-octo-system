@@ -3,98 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>世界国家边界 </title>
+    <title>世界水体 - 全球河流湖泊海洋</title>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; display: flex; flex-direction: column; }
-        .app-header { background: linear-gradient(135deg, #1a2a6c, #2c3e50, #2a5298); color: white; padding: 16px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 3px solid #f39c12; flex-shrink: 0; }
-        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; }
-        .header-title { display: flex; align-items: center; gap: 12px; }
-        .title-icon { font-size: 32px; }
-        .header-title h1 { font-size: 26px; font-weight: 600; }
-        .title-badge { background: rgba(243,156,18,0.9); padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-left: 12px; }
-        .map-area { flex: 1; display: flex; min-height: 0; }
-        .left-panel { width: 320px; background: white; box-shadow: 2px 0 12px rgba(0,0,0,0.08); overflow-y: auto; border-right: 1px solid #d0d7de; z-index: 10; }
-        .panel-card { border-bottom: 1px solid #e9ecef; }
-        .card-header { display: flex; align-items: center; gap: 10px; padding: 16px 18px; background: #f8f9fa; border-bottom: 1px solid #dee2e6; }
-        .card-header h3 { font-size: 16px; font-weight: 600; color: #2c3e50; text-transform: uppercase; }
-        .card-body { padding: 8px 0; max-height: 400px; overflow-y: auto; }
-        .map-container { flex: 1; height: 100%; position: relative; }
-        .map-widget-search { position: absolute; top: 20px; right: 20px; width: 320px; z-index: 20; box-shadow: 0 4px 16px rgba(0,0,0,0.15); border-radius: 8px; }
-        .map-widget-scalebar { position: absolute; bottom: 20px; left: 20px; z-index: 20; }
-        .app-footer { background: #2c3e50; color: #ecf0f1; padding: 12px 24px; text-align: center; border-top: 2px solid #1a252f; flex-shrink: 0; font-size: 13px; }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        html, body { height: 100%; width: 100%; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #eef2f7; display: flex; flex-direction: column; }
+
+        /* 页眉区域 */
+        .app-header {
+            background: linear-gradient(135deg, #0f3b5e, #1a5276, #1b6b8a);
+            color: white;
+            padding: 14px 28px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            border-bottom: 4px solid #3498db;
+            flex-shrink: 0;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .title-icon { font-size: 34px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .header-title h1 { font-size: 26px; font-weight: 600; letter-spacing: 1px; }
+        .title-badge {
+            background: rgba(52, 152, 219, 0.9);
+            padding: 5px 14px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 16px;
+        }
+        .header-data-source { font-size: 14px; opacity: 0.9; }
+
+        /* 地图主体区域 */
+        .map-area {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+            position: relative;
+        }
+
+        /* 左侧控制面板 */
+        .left-panel {
+            width: 340px;
+            background: white;
+            box-shadow: 4px 0 18px rgba(0,0,0,0.06);
+            overflow-y: auto;
+            border-right: 1px solid #cbd5e0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-card {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a5276;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-body {
+            padding: 8px 0;
+            max-height: 380px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        /* 地图容器 */
+        .map-container {
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        /* 搜索框微件 - 位于地图右上 */
+        .map-widget-search {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 340px;
+            z-index: 20;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* 比例尺微件 - 位于地图左下 */
+        .map-widget-scalebar {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            z-index: 20;
+        }
+
+        /* 页脚区域 */
+        .app-footer {
+            background: #0f3b5e;
+            color: #eaf2f8;
+            padding: 14px 28px;
+            text-align: center;
+            border-top: 2px solid #1a5276;
+            flex-shrink: 0;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-content a {
+            color: #85c1e9;
+            text-decoration: none;
+        }
+        .footer-content a:hover { text-decoration: underline; }
+
+        /* 滚动条美化 */
+        .left-panel::-webkit-scrollbar { width: 6px; }
+        .left-panel::-webkit-scrollbar-track { background: #f1f1f1; }
+        .left-panel::-webkit-scrollbar-thumb { background: #b0c4de; border-radius: 6px; }
+        .left-panel::-webkit-scrollbar-thumb:hover { background: #7f9fbf; }
     </style>
 </head>
 <body>
+    <!-- 页眉区域 -->
     <header class="app-header">
         <div class="header-content">
             <div class="header-title">
-                <span class="title-icon">🗺️</span>
-                <h1>世界国家边界</h1>
+                <span class="title-icon">🌊</span>
+                <h1>世界水体 · 河流 · 湖泊 · 海洋</h1>
+                <span class="title-badge">ArcGIS Living Atlas</span>
             </div>
-            <div><span>数据来源: ArcGIS Living Atlas</span></div>
+            <div class="header-data-source">
+                <span>🌐 数据: World Water Bodies (Esri / Garmin)</span>
+            </div>
         </div>
     </header>
+
+    <!-- 地图主体区域 -->
     <div class="map-area">
+        <!-- 左侧控制面板：底图库、图层列表、图例 -->
         <div class="left-panel">
             <div class="panel-card">
-                <div class="card-header"><span>🗺️</span><h3>底图切换</h3></div>
+                <div class="card-header">
+                    <span>🗺️</span>
+                    <h3>底图切换</h3>
+                </div>
                 <div class="card-body" id="basemapGalleryDiv"></div>
             </div>
             <div class="panel-card">
-                <div class="card-header"><span>📋</span><h3>图层控制</h3></div>
+                <div class="card-header">
+                    <span>📋</span>
+                    <h3>图层控制</h3>
+                </div>
                 <div class="card-body" id="layerListDiv"></div>
             </div>
             <div class="panel-card">
-                <div class="card-header"><span>🎨</span><h3>图例</h3></div>
+                <div class="card-header">
+                    <span>🎨</span>
+                    <h3>图例</h3>
+                </div>
                 <div class="card-body" id="legendDiv"></div>
             </div>
+            <!-- 可以留白增加呼吸感 -->
+            <div style="flex:1; min-height:20px;"></div>
         </div>
+
+        <!-- 地图视图容器 -->
         <div id="viewDiv" class="map-container"></div>
+
+        <!-- 搜索框微件容器 -->
         <div id="searchDiv" class="map-widget-search"></div>
+
+        <!-- 比例尺微件容器 -->
         <div id="scaleBarDiv" class="map-widget-scalebar"></div>
     </div>
+
+    <!-- 页脚区域 -->
     <footer class="app-footer">
         <div class="footer-content">
-            <p>© 2026 实验六：基于ArcGIS API for JavaScript构建WebGIS应用</p>
+            <p>© 2026 实验六：基于ArcGIS API for JavaScript 构建WebGIS应用 | 水体数据展示</p>
+            <p>📌 地图包含全球河流、湖泊、海洋、干盐湖等要素</p>
         </div>
     </footer>
+
     <script src="https://js.arcgis.com/4.28/"></script>
     <script>
         require([
-            "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer",
-            "esri/widgets/BasemapGallery", "esri/widgets/LayerList", "esri/widgets/Legend",
-            "esri/widgets/Search", "esri/widgets/ScaleBar"
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/BasemapGallery",
+            "esri/widgets/LayerList",
+            "esri/widgets/Legend",
+            "esri/widgets/Search",
+            "esri/widgets/ScaleBar"
         ], function(Map, MapView, FeatureLayer, BasemapGallery, LayerList, Legend, Search, ScaleBar) {
-            const map = new Map({ basemap: "streets-navigation-vector" });
             
-            // --- 在这里替换成你选择的新图层URL ---
-            const featureLayerUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/World_Countries_(Generalized)/FeatureServer/0";
+            // 创建底图 (使用 streets-vector 底图)
+            const map = new Map({
+                basemap: "streets-vector"
+            });
+
+            // ========== 🌊 替换为 "World Water Bodies" 公开数据 ==========
+            // 数据来源: Esri Living Atlas - World Water Bodies
+            // 服务 URL: 直接指向 FeatureLayer 的 REST 端点
+            const waterBodiesUrl = "https://services3.arcgis.com/8a4lrasHsYiB0dvX/ArcGIS/rest/services/Waponahkik___1727_WFL1/FeatureServer/99";
             
-            const featureLayer = new FeatureLayer({
-                url: featureLayerUrl,
-                title: "世界国家边界",
+            const waterBodiesLayer = new FeatureLayer({
+                url: waterBodiesUrl,
+                title: "🌊 世界水体 (河流/湖泊/海洋)",
+                // 设置弹出信息模板，显示水体名称和类型
                 popupTemplate: {
-                    title: "{COUNTRY}",
-                    content: "人口估计: {POP_EST}"
+                    title: "🌍 {Name1}",
+                    content: [
+                        {
+                            type: "fields",
+                            fieldInfos: [
+                                { fieldName: "TYPE", label: "水体类型" },
+                                { fieldName: "Name1", label: "名称" }
+                            ]
+                        }
+                    ]
                 }
             });
             
-            map.add(featureLayer);
+            map.add(waterBodiesLayer);
             
+            // 创建地图视图
             const view = new MapView({
-                container: "viewDiv", map: map, center: [0, 20], zoom: 2,
-                ui: { components: ["zoom", "compass"] }
+                container: "viewDiv",
+                map: map,
+                center: [15, 25],     // 初始中心点 (经度, 纬度) —— 非洲/地中海区域，利于展示水体
+                zoom: 3,
+                ui: {
+                    components: ["zoom", "compass"]  // 保留默认缩放和指南针控件
+                }
             });
             
+            // 视图准备就绪后，挂载所有微件
             view.when(() => {
-                new BasemapGallery({ view: view, container: "basemapGalleryDiv" });
-                new LayerList({ view: view, container: "layerListDiv" });
-                new Legend({ view: view, container: "legendDiv" });
-                new Search({ view: view, container: "searchDiv", includeDefaultSources: true });
-                new ScaleBar({ view: view, container: "scaleBarDiv", unit: "dual" });
+                // 底图库微件
+                const basemapGallery = new BasemapGallery({
+                    view: view,
+                    container: "basemapGalleryDiv"
+                });
+                
+                // 图层列表微件
+                const layerList = new LayerList({
+                    view: view,
+                    container: "layerListDiv"
+                });
+                
+                // 图例微件
+                const legend = new Legend({
+                    view: view,
+                    container: "legendDiv"
+                });
+                
+                // 搜索微件
+                const searchWidget = new Search({
+                    view: view,
+                    container: "searchDiv",
+                    includeDefaultSources: true,  // 包含默认搜索源 (地理编码、图层等)
+                    // 可以针对图层添加自定义搜索源
+                    sources: [
+                        {
+                            layer: waterBodiesLayer,
+                            searchFields: ["Name1"],
+                            displayField: "Name1",
+                            exactMatch: false,
+                            outFields: ["Name1", "TYPE"],
+                            name: "世界水体",
+                            placeholder: "搜索河流、湖泊、海洋名称..."
+                        }
+                    ]
+                });
+                
+                // 比例尺微件
+                const scaleBar = new ScaleBar({
+                    view: view,
+                    container: "scaleBarDiv",
+                    unit: "dual"   // 同时显示公制/英制
+                });
+                
+                // 可以调整搜索框占位符文本，使其更友好
+                // (非必须)
+                setTimeout(() => {
+                    const inputElem = document.querySelector('#searchDiv input');
+                    if (inputElem) {
+                        inputElem.placeholder = "🔍 搜索河流、湖泊、海洋...";
+                    }
+                }, 500);
+            });
+            
+            // 错误处理提示
+            view.watch("updating", (status) => {
+                if (!status) {
+                    console.log("地图加载完成。当前使用的专题图层: World Water Bodies");
+                }
+            });
+            
+            // 图层加载失败时打印友好提示
+            waterBodiesLayer.loadError.catch(err => {
+                console.warn("水体图层加载出错，请检查网络或URL有效性。错误详情:", err);
+                // 如果图层加载失败，仍可正常使用底图和其他功能
             });
         });
     </script>
